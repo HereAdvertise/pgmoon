@@ -225,7 +225,7 @@ class Postgres
   -- password: the username to authenticate with
   -- database: database to connect to
   -- application_name: name assigned to connection to server
-  -- socket_type: type of socket to use (nginx, luasocket, cqueues)
+  -- socket_type: type of socket to use (nginx, redbean, luasocket, cqueues)
   -- ssl: enable ssl connections
   -- ssl_verify: verify the certificate
   -- cqueues_openssl_context: manually created openssl.ssl.context for cqueues sockets
@@ -395,6 +395,8 @@ class Postgres
         if @sock_type == "cqueues"
           openssl_x509 = @sock\getpeercertificate!
           openssl_x509\digest "sha256", "s"
+        if @sock_type == "redbean"
+          error "Not supported at the moment."
         else
           pem, signature = if @sock_type == "nginx"
             ssl = require("resty.openssl.ssl").from_socket(@sock)

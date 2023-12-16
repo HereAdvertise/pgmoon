@@ -1,6 +1,18 @@
 local md5
 if ngx then
   md5 = ngx.md5
+elseif GetRedbeanVersion then
+  local hex_char
+  hex_char = function(c)
+    return string.format("%02x", string.byte(c))
+  end
+  local hex
+  hex = function(str)
+    return (str:gsub(".", hex_char))
+  end
+  md5 = function(str)
+    return hex(Md5(str))
+  end
 elseif pcall(function()
   return require("openssl.digest")
 end) then
@@ -29,7 +41,11 @@ else
   end
 end
 local hmac_sha256
-if pcall(function()
+if GetRedbeanVersion then
+  hmac_sha256 = function(key, str)
+    return assert(GetCryptoHash("SHA256", str, key))
+  end
+elseif pcall(function()
   return require("openssl.hmac")
 end) then
   hmac_sha256 = function(key, str)
@@ -53,7 +69,11 @@ else
   end
 end
 local digest_sha256
-if pcall(function()
+if GetRedbeanVersion then
+  digest_sha256 = function(str)
+    return assert(Sha256(str))
+  end
+elseif pcall(function()
   return require("openssl.digest")
 end) then
   digest_sha256 = function(str)
@@ -131,7 +151,9 @@ else
   end
 end
 local random_bytes
-if pcall(function()
+if GetRedbeanVersion then
+  random_bytes = GetRandomBytes
+elseif pcall(function()
   return require("openssl.rand")
 end) then
   random_bytes = require("openssl.rand").bytes

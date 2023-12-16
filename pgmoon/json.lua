@@ -2,7 +2,6 @@ local default_escape_literal = nil
 local encode_json
 encode_json = function(tbl, escape_literal)
   escape_literal = escape_literal or default_escape_literal
-  local json = require("cjson")
   if not (escape_literal) then
     local Postgres
     Postgres = require("pgmoon").Postgres
@@ -11,13 +10,23 @@ encode_json = function(tbl, escape_literal)
     end
     escape_literal = default_escape_literal
   end
-  local enc = json.encode(tbl)
+  local enc
+  if GetRedbeanVersion then
+    enc = EncodeJson(tbl)
+  else
+    local json = require("cjson")
+    enc = json.encode(tbl)
+  end
   return escape_literal(enc)
 end
 local decode_json
 decode_json = function(str)
-  local json = require("cjson")
-  return json.decode(str)
+  if GetRedbeanVersion then
+    return DecodeJson(str)
+  else
+    local json = require("cjson")
+    return json.decode(str)
+  end
 end
 return {
   encode_json = encode_json,

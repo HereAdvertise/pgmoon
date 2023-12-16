@@ -1,6 +1,10 @@
 
 md5 = if ngx
   ngx.md5
+elseif GetRedbeanVersion
+  hex_char = (c) -> string.format "%02x", string.byte c
+  hex = (str) -> (str\gsub ".", hex_char)
+  (str) -> hex Md5 str
 elseif pcall -> require "openssl.digest"
   openssl_digest = require "openssl.digest"
   hex_char = (c) -> string.format "%02x", string.byte c
@@ -14,7 +18,10 @@ else
   -> error "Either luaossl (recommended) or LuaCrypto is required to calculate md5"
 
 
-hmac_sha256 = if pcall -> require "openssl.hmac"
+hmac_sha256 = if GetRedbeanVersion
+  (key, str) ->
+    assert GetCryptoHash "SHA256", str, key
+elseif pcall -> require "openssl.hmac"
   (key, str) ->
     openssl_hmac = require("openssl.hmac")
     hmac = assert openssl_hmac.new(key, "sha256")
@@ -32,7 +39,10 @@ else
   -> error "Either luaossl or resty.openssl is required to calculate hmac sha256 digest"
 
 
-digest_sha256 = if pcall -> require "openssl.digest"
+digest_sha256 = if GetRedbeanVersion
+  (str) ->
+    assert Sha256 str
+elseif pcall -> require "openssl.digest"
   (str) ->
     digest = assert require("openssl.digest").new("sha256")
     digest\update str
@@ -95,7 +105,9 @@ else
   -> error "Either luaossl or resty.openssl is required to derive pbkdf2 key"
 
 
-random_bytes = if pcall -> require "openssl.rand"
+random_bytes = if GetRedbeanVersion
+  GetRandomBytes
+elseif pcall -> require "openssl.rand"
   require("openssl.rand").bytes
 elseif pcall -> require "resty.random"
   require("resty.random").bytes

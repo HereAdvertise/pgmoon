@@ -85,12 +85,16 @@ create_luasocket = do
       -- luasocket
       socket_type = if ngx and ngx.get_phase! != "init"
         "nginx"
+      elseif GetRedbeanVersion
+        "redbean"
       else
         "luasocket"
 
     socket = switch socket_type
       when "nginx"
         ngx.socket.tcp!
+      when "redbean"
+        require("pgmoon.redbean").RedbeanSocket!
       when "luasocket"
         create_luasocket!
       when "cqueues"

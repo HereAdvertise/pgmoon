@@ -390,7 +390,10 @@ do
         do
           if self.sock_type == "cqueues" then
             local openssl_x509 = self.sock:getpeercertificate()
-            cbind_data = openssl_x509:digest("sha256", "s")
+            openssl_x509:digest("sha256", "s")
+          end
+          if self.sock_type == "redbean" then
+            cbind_data = error("Not supported at the moment.")
           else
             local pem, signature
             if self.sock_type == "nginx" then

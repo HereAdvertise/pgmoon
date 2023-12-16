@@ -89,6 +89,8 @@ return {
     if socket_type == nil then
       if ngx and ngx.get_phase() ~= "init" then
         socket_type = "nginx"
+      elseif GetRedbeanVersion then
+        socket_type = "redbean"
       else
         socket_type = "luasocket"
       end
@@ -97,6 +99,8 @@ return {
     local _exp_0 = socket_type
     if "nginx" == _exp_0 then
       socket = ngx.socket.tcp()
+    elseif "redbean" == _exp_0 then
+      socket = require("pgmoon.redbean").RedbeanSocket()
     elseif "luasocket" == _exp_0 then
       socket = create_luasocket()
     elseif "cqueues" == _exp_0 then

@@ -26,6 +26,9 @@ if ngx then
     local _obj_0 = ngx
     encode_base64, decode_base64 = _obj_0.encode_base64, _obj_0.decode_base64
   end
+elseif GetRedbeanVersion then
+  encode_base64 = EncodeBase64
+  decode_base64 = DecodeBase64
 else
   local b64, unb64
   do

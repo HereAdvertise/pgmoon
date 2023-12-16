@@ -20,6 +20,9 @@ local encode_base64, decode_base64
 
 if ngx
   {:encode_base64, :decode_base64} = ngx
+elseif GetRedbeanVersion
+  encode_base64 = EncodeBase64
+  decode_base64 = DecodeBase64
 else
   { :b64, :unb64 } = require "mime" -- provided by luasocket
   encode_base64 = (...) -> (b64 ...)

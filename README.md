@@ -11,8 +11,8 @@
 **pgmoon** was originally designed for use in [OpenResty][] to take advantage
 of the [cosocket
 api](https://github.com/openresty/lua-nginx-module#ngxsockettcp) to provide
-asynchronous queries but it also works in the regular any Lua environment where
-[LuaSocket][] or [cqueues][] is available.
+asynchronous queries but it also works in the regular any Lua environment where [Redbean][],
+[LuaSocket][], or [cqueues][] is available.
 
 It's a perfect candidate for running your queries both inside OpenResty's
 environment and on the command line (eg. tests) in web frameworks like [Lapis][].
@@ -47,6 +47,7 @@ A socket implementation **is required** to use pgmoon, depending on the
 environment you can chose one:
 
 * [OpenResty][] &mdash; The built in socket is used, no additional dependencies necessary
+* [Redbean][] &mdash; The built in socket is used, no additional dependencies necessary
 * [LuaSocket][] &mdash; `luarocks install luasocket`
 * [cqueues][] &mdash; `luarocks install cqueues`
 
@@ -56,7 +57,7 @@ If you're on PUC Lua 5.1 or 5.2 then you will need a bit libray (not needed for 
 $ luarocks install luabitop
 ```
 
-If you want to use JSON types you will need lua-cjson
+If you want to use JSON types you will need lua-cjson (not required for `Redbean`)
 
 ```bash
 $ luarocks install lua-cjson
@@ -65,10 +66,11 @@ $ luarocks install lua-cjson
 SSL connections may require an additional dependency:
 
 * OpenResty &mdash; `luarocks install lua-resty-openssl`
+* Redbean &mdash; Not supported at the moment.
 * LuaSocket &mdash; `luarocks install luasec`
 * cqueues &mdash; `luarocks install luaossl`
 
-Password authentication may require a crypto library, [luaossl][].
+Password authentication may require a crypto library, [luaossl][] (not required for `Redbean`)
 
 ```bash
 $ luarocks install luaossl
@@ -139,7 +141,7 @@ Available options:
 * `"ssl"`: enable ssl (default: `false`)
 * `"ssl_verify"`: verify server certificate (default: `nil`)
 * `"ssl_required"`: abort the connection if the server does not support SSL connections (default: `nil`)
-* `"socket_type"`: the type of socket to use, one of: `"nginx"`, `"luasocket"`, `cqueues` (default: `"nginx"` if in nginx, `"luasocket"` otherwise)
+* `"socket_type"`: the type of socket to use, one of: `"nginx"`, `"redbean"`, `"luasocket"`, `cqueues` (default: `"nginx"` if in nginx, `"redbean"` if in Redbean, `"luasocket"` otherwise)
 * `"application_name"`: set the name of the connection as displayed in `pg_stat_activity`. (default: `"pgmoon"`)
 * `"pool"`: (OpenResty only) name of pool to use when using OpenResty cosocket (default: `"#{host}:#{port}:#{database}"`)
 * `"pool_size"`: (OpenResty only) Passed directly to OpenResty cosocket connect function, [see docs](https://github.com/openresty/lua-nginx-module#tcpsockconnect)
@@ -784,3 +786,4 @@ THE SOFTWARE.
   [OpenResty]: https://openresty.org/
   [LuaSocket]: http://w3.impa.br/~diego/software/luasocket/
   [cqueues]: http://25thandclement.com/~william/projects/cqueues.html
+  [Redbean]: https://redbean.dev/

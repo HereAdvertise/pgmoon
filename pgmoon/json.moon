@@ -2,7 +2,6 @@ default_escape_literal = nil
 
 encode_json = (tbl, escape_literal) ->
   escape_literal or= default_escape_literal
-  json = require "cjson"
 
   unless escape_literal
     import Postgres from require "pgmoon"
@@ -11,11 +10,21 @@ encode_json = (tbl, escape_literal) ->
 
     escape_literal = default_escape_literal
 
-  enc = json.encode tbl
+  local enc
+
+  if GetRedbeanVersion
+    enc = EncodeJson tbl
+  else
+    json = require "cjson"
+    enc = json.encode tbl
+
   escape_literal enc
 
 decode_json = (str) ->
-  json = require "cjson"
-  json.decode str
+  if GetRedbeanVersion
+    return DecodeJson str
+  else
+    json = require "cjson"
+    return json.decode str
 
 { :encode_json, :decode_json }
