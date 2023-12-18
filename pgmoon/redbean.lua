@@ -34,7 +34,7 @@ do
         return nil, "close"
       end
       local sent, err = unix.send(self.unix_socket, data)
-      if not (sent and err:name() == "EAGAIN") then
+      if not sent and err:name() == "EAGAIN" then
         return nil, "timeout"
       end
       return sent, err
