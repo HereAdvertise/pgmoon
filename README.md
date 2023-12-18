@@ -51,13 +51,13 @@ environment you can chose one:
 * [LuaSocket][] &mdash; `luarocks install luasocket`
 * [cqueues][] &mdash; `luarocks install cqueues`
 
-If you're on PUC Lua 5.1 or 5.2 then you will need a bit libray (not needed for LuaJIT):
+If you're on PUC Lua 5.1 or 5.2 then you will need a bit libray (not required for `nginx` and `redbean`):
 
 ```bash
 $ luarocks install luabitop
 ```
 
-If you want to use JSON types you will need lua-cjson (not required for `Redbean`)
+If you want to use JSON types you will need lua-cjson (not required for `redbean`)
 
 ```bash
 $ luarocks install lua-cjson
@@ -70,14 +70,14 @@ SSL connections may require an additional dependency:
 * LuaSocket &mdash; `luarocks install luasec`
 * cqueues &mdash; `luarocks install luaossl`
 
-Password authentication may require a crypto library, [luaossl][] (not required for `Redbean`)
+Password authentication may require a crypto library, [luaossl][] (not required for `redbean`)
 
 ```bash
 $ luarocks install luaossl
 ```
 > **Note:** [LuaCrypto][] can be used as a fallback, but the library is abandoned and not recommended for use
 
-> **Note:** Use within [OpenResty][] will prioritize built  in functions if possible
+> **Note:** Use within [OpenResty][] will prioritize built in functions if possible
 
 Parsing complex types like Arrays and HStore requires `lpeg` to be installed.
 
@@ -105,6 +105,52 @@ after you are done with it so it can be reused in future requests:
 
 ```lua
 pg:keepalive()
+```
+
+## Usage in Redbean
+
+Create a directory to work with the Redbean server, then download the latest version into this directory.
+
+```
+apt install curl zip
+mkdir redbean-pgmoon
+cd redbean-pgmoon
+curl https://redbean.dev/redbean-latest.com >redbean.com
+chmod +x redbean.com
+```
+
+Create the file `test.lua` to access the Postgres database.
+
+```lua
+-- test.lua
+
+local pgmoon = require("pgmoon")
+
+local pg = pgmoon.new({
+  host = "127.0.0.1",
+  port = "5432",
+  database = "database_name",
+  user = "database_user",
+  password = "database_password"
+})
+
+assert(pg:connect())
+
+print(EncodeJson(assert(pg:query("SELECT 'hello world';"))))
+```
+
+The Redbean server operates within a zipped structure. To integrate pgmoon into this structure, follow the steps below:
+
+```
+git clone git@github.com:Propagram/pgmoon.git
+mv pgmoon .lua
+zip -r redbean.com .lua
+```
+
+Now just execute the `test.lua` file.
+
+```
+./redbean.com -i test.lua
 ```
 
 ## Considerations
