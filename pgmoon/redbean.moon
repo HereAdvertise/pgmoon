@@ -30,7 +30,7 @@ class RedbeanSocket
     return nil, "timeout" unless events[@unix_socket]
     return nil, "close" if events[@unix_socket] & CANWRITE == 0
     sent, err = unix.send(@unix_socket, data)
-    return nil, "timeout" unless sent and err\name! == "EAGAIN"
+    return nil, "timeout" if not sent and err\name! == "EAGAIN"
     sent, err
 
   receive: (...) =>
