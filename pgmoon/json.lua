@@ -13,6 +13,7 @@ encode_json = function(tbl, escape_literal)
   local enc
   if GetRedbeanVersion then
     enc = EncodeJson(tbl)
+    enc = enc:gsub("\\u0027", "''")
   else
     local json = require("cjson")
     enc = json.encode(tbl)
