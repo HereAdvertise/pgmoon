@@ -125,11 +125,11 @@ jobs:
 
     - name: busted install
       run: |
-        luarocks --tree .lua config lua_modules_path ''
-        luarocks --tree .lua config lib_modules_path ''
-        luarocks --tree .lua config rocks_subdir ''
-        luarocks --tree .lua install busted
-        ls .lua
+        sudo luarocks --tree .lua config lua_modules_path ''
+        sudo luarocks --tree .lua config lib_modules_path ''
+        sudo luarocks --tree .lua config rocks_subdir ''
+        sudo luarocks --tree .lua install busted
+        sudo ls .lua
 
     - name: install
       working-directory: redbean-pgmoon
