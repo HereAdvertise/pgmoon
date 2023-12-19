@@ -1,3 +1,5 @@
+if GetRedbeanVersion
+  require'busted.runner'!
 
 import Postgres from require "pgmoon"
 
@@ -104,14 +106,21 @@ describe "pgmoon with server", ->
   teardown ->
     os.execute "spec/postgres.sh stop"
 
-  for socket_type in *{"luasocket", "cqueues", "nginx"}
+  for socket_type in *{"luasocket", "cqueues", "nginx", "redbean"}
     if ngx
       unless socket_type == "nginx"
         it "(disabled)", -> pending "skipping #{socket_type} in nginx testing mode"
         continue
+    elseif GetRedbeanVersion
+      unless socket_type == "redbean"
+        it "(disabled)", -> pending "skipping #{socket_type} in redbean testing mode"
+        continue
     else
       if socket_type == "nginx"
         it "(disabled)", -> pending "Skipping nginx tests, no ngx global available"
+        continue
+      elseif socket_type == "redbean"
+        it "(disabled)", -> pending "Skipping redbean tests, no GetRedbeanVersion global available"
         continue
 
     describe "socket(#{socket_type})", ->
@@ -188,6 +197,9 @@ describe "pgmoon with server", ->
         assert pg\query "select 1"
 
       it "tries to connect with SSL", ->
+        if socket_type == "redbean"
+          return pending "not supported for redbean at the moment."
+
         -- we expect a server with ssl = off
         ssl_pg = Postgres {
           database: DB
@@ -205,6 +217,9 @@ describe "pgmoon with server", ->
         assert ssl_pg\connect!
 
       it "requires SSL", ->
+        if socket_type == "redbean"
+          return pending "not supported for redbean at the moment."
+
         ssl_pg = Postgres {
           database: DB
           user: USER
@@ -295,7 +310,11 @@ describe "pgmoon with server", ->
           }, res
 
         it "json custom serializable value", ->
-          json = require("cjson")
+          local json
+          if socket_type == "redbean"
+            json = encode: EncodeJson, null: nil
+          else
+            json = require("cjson")
 
           json_type = (v) ->
             setmetatable { v }, {
@@ -322,6 +341,9 @@ describe "pgmoon with server", ->
           }, res
 
         it "array custom serializer", ->
+          if socket_type == "redbean"
+            return pending "not supported for redbean at the moment."
+
           numeric_array = (v) ->
             setmetatable { v }, {
               pgmoon_serialize: (pgmoon) =>
@@ -639,6 +661,9 @@ describe "pgmoon with server", ->
           }, notices
 
       describe "hstore", ->
+        if socket_type == "redbean"
+          return pending "not supported for redbean at the moment."
+
         import encode_hstore, decode_hstore from require "pgmoon.hstore"
 
         describe "encoding", ->
@@ -712,7 +737,11 @@ describe "pgmoon with server", ->
             assert.same {abc: '123', foo: 'bar'}, res[1].h
 
       describe "json", ->
-        import encode_json, decode_json from require "pgmoon.json"
+        local encode_json, decode_json
+        if socket_type == "redbean"
+          encode_json, decode_json = EncodeJson, DecodeJson
+        else
+          import encode_json, decode_json from require "pgmoon.json"
 
         it "encodes json type", ->
           t = { hello: "world" }
@@ -753,6 +782,9 @@ describe "pgmoon with server", ->
           ]]
 
       describe "arrays", ->
+        if socket_type == "redbean"
+          return pending "not supported for redbean at the moment."
+    
         import decode_array, encode_array, PostgresArray from require "pgmoon.arrays"
 
         it "converts table to array", ->
