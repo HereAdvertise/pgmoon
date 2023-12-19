@@ -11,7 +11,7 @@ do
       local err
       self.sock, err = unix.connect(self.unix_socket, assert(ResolveIp(host)), port)
       if not (self.sock) then
-        return nil, err
+        return nil, err:doc()
       end
       return true
     end,

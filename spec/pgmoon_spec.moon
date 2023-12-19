@@ -202,7 +202,7 @@ describe "pgmoon with server", ->
           "Operation timed out": true
         }
 
-        assert.true err
+        assert.true errors[err]
 
       it "keepalive()", ->
         if socket_type != "nginx"

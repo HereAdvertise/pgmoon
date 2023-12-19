@@ -10,7 +10,7 @@ class RedbeanSocket
     @sock, err = unix.connect @unix_socket, assert(ResolveIp host), port
 
     unless @sock
-      return nil, err
+      return nil, err\doc!
 
     true
 
