@@ -136,8 +136,8 @@ jobs:
         path: redbean-pgmoon/busted
 
     - name: install
+      working-directory: redbean-pgmoon
       run: |
-        cd redbean-pgmoon
         sudo apt install zip curl
         curl https://redbean.dev/redbean-latest.com >redbean.com
         chmod +x redbean.com
@@ -149,6 +149,7 @@ jobs:
         rm -r .lua
 
     - name: test
+      working-directory: redbean-pgmoon
       run: |
         ./redbean.com -i ../spec/pgmoon_spec.lua
 
