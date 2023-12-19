@@ -5,6 +5,7 @@ if GetRedbeanVersion
       return nil unless d
       t = DT_REG: "file", DT_DIR: "directory"
       t[assert select 2, d\read!]
+    chdir = unix.chdir
   }
   package.loaded["term.core"] = {isatty: -> true}  -- unix.isatty
   package.loaded["system.core"] = {}
