@@ -140,18 +140,14 @@ jobs:
         cd redbean-pgmoon
         sudo apt install zip curl
         curl https://redbean.dev/redbean-latest.com >redbean.com
-        #git clone git@github.com:Propagram/pgmoon.git
         mv pgmoon .lua
         zip -r redbean.com .lua
         rm -r .lua
-        #git clone git@github.com:lunarmodules/busted.git
         mv busted .lua
         zip -u -r redbean.com .lua
         rm -r .lua
 
     - name: test
-      shell: bash
-      working-directory: redbean-pgmoon
       run: |
-        sudo bash -c './redbean.com -i ../spec/pgmoon_spec.lua'
+        sudo redbean-pgmoon/redbean.com -i ../spec/pgmoon_spec.lua
 
