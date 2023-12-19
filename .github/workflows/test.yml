@@ -138,6 +138,7 @@ jobs:
         curl https://redbean.dev/redbean-latest.com >redbean.com
         chmod +x redbean.com
         sh ./redbean.com --assimilate
+        moonc pgmoon
         mv pgmoon .lua
         zip -r redbean.com .lua
         rm -r .lua
