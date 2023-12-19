@@ -153,5 +153,5 @@ jobs:
       shell: bash
       working-directory: redbean-pgmoon
       run: |
-        sudo bash -c ''./redbean.com -i ../spec/pgmoon_spec.lua'
+        sudo bash -c './redbean.com -i ../spec/pgmoon_spec.lua'
 
