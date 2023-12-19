@@ -10,8 +10,8 @@ if GetRedbeanVersion
   package.loaded["term.core"] = {isatty: -> true}  -- unix.isatty
   package.loaded["system.core"] = {}
   package.loaded["system"] = {
-    gettime: unix.clock_gettime!
-    monotime: unix.clock_gettime CLOCK_MONOTONIC
+    gettime: -> unix.clock_gettime!
+    monotime: -> unix.clock_gettime CLOCK_MONOTONIC
   }
   require'busted.runner'!
 
