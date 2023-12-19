@@ -137,6 +137,9 @@ jobs:
         sh ./redbean.com --assimilate
         mv /home/runner/work/pgmoon/pgmoon/.luarocks/share/lua/5.4 .lua
         zip -u -r redbean.com .lua
+        rm -r .lua
+        mv /home/runner/work/pgmoon/pgmoon/.luarocks/lib/lua/5.4 .lua
+        zip -u -r redbean.com .lua
 
     - name: test
       working-directory: redbean-pgmoon
