@@ -1,7 +1,6 @@
 if GetRedbeanVersion
-  package.loaded["lfs"] = {
-
-  }
+  package.loaded["lfs"] = {}
+  package.loaded["term.core"] = {}
   require'busted.runner'!
 
 import Postgres from require "pgmoon"
