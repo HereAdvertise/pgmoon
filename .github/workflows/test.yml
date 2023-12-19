@@ -115,7 +115,7 @@ jobs:
 
     - name: dependencies
       run: |
-        luarocks install moonscript
+        luarocks install moonscript --dev
 
     - name: build
       run: |
