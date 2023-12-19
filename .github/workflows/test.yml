@@ -141,7 +141,7 @@ jobs:
         sudo apt install zip curl
         curl https://redbean.dev/redbean-latest.com >redbean.com
         chmod +x redbean.com
-        ./redbean.com --assimilate
+        sh ./redbean.com --assimilate
         mv pgmoon .lua
         zip -r redbean.com .lua
         rm -r .lua
