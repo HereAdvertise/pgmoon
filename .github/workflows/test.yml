@@ -150,7 +150,8 @@ jobs:
         rm -r .lua
 
     - name: test
+      shell: bash
       run: |
         cd redbean-pgmoon
-        sudo bash -c 'sudo ./redbean.com -i ../spec/pgmoon_spec.lua'
+        ./redbean.com -i ../spec/pgmoon_spec.lua
 
