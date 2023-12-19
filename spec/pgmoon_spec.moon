@@ -1,4 +1,5 @@
 if GetRedbeanVersion
+  require("lfs")
   require'busted.runner'!
 
 import Postgres from require "pgmoon"
