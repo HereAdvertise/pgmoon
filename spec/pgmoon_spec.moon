@@ -1,6 +1,6 @@
 if GetRedbeanVersion
   package.loaded["lfs"] = {
-    attrib: (filepath) ->
+    attributes: (filepath) ->
       d = unix.opendir filepath
       t = DT_REG: "file", DT_DIR: "directory"
       t[select 2, d\read!]
