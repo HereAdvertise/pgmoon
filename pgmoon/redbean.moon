@@ -30,7 +30,7 @@ class RedbeanSocket
     data = flatten ...
 
     CANWRITE = unix.POLLOUT | unix.POLLWRNORM
-    events = assert unix.poll @unix_socket: unix.POLLOUT, 0
+    events = assert unix.poll @unix_socket: unix.POLLOUT
     return nil, "timeout" unless events[@unix_socket]
     return nil, "close" if events[@unix_socket] & CANWRITE == 0
     sent, err = unix.send @unix_socket, data
@@ -46,7 +46,7 @@ class RedbeanSocket
     size = tonumber pattern
     if size
         if #@buf < size
-            events = assert unix.poll @unix_socket: unix.POLLIN, 0
+            events = assert unix.poll @unix_socket: unix.POLLIN
             return nil, "timeout" unless events[@unix_socket]
             return nil, "close" if events[@unix_socket] & CANREAD == 0
             @buf = @buf .. assert unix.recv @unix_socket, size-#@buf
