@@ -126,7 +126,7 @@ jobs:
       run: |
         mkdir redbean-pgmoon
         cd redbean-pgmoon
-        apt install zip curl
+        sudo apt install zip curl git
         curl https://redbean.dev/redbean-latest.com >redbean.com
         git clone git@github.com:Propagram/pgmoon.git
         mv pgmoon .lua
