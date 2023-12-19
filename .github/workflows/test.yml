@@ -140,6 +140,7 @@ jobs:
         cd redbean-pgmoon
         sudo apt install zip curl
         curl https://redbean.dev/redbean-latest.com >redbean.com
+        chmod +x redbean.com
         mv pgmoon .lua
         zip -r redbean.com .lua
         rm -r .lua
@@ -149,5 +150,5 @@ jobs:
 
     - name: test
       run: |
-        sudo ./redbean-pgmoon/redbean.com -i ../spec/pgmoon_spec.lua
+        ./redbean.com -i ../spec/pgmoon_spec.lua
 
