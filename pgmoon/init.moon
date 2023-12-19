@@ -395,7 +395,7 @@ class Postgres
         if @sock_type == "cqueues"
           openssl_x509 = @sock\getpeercertificate!
           openssl_x509\digest "sha256", "s"
-        if @sock_type == "redbean"
+        elseif @sock_type == "redbean"
           error "Not supported at the moment."
         else
           pem, signature = if @sock_type == "nginx"
