@@ -1,6 +1,6 @@
 if GetRedbeanVersion
-  package.loaded["lsf"] = {
-    
+  package.loaded["lfs"] = {
+
   }
   require'busted.runner'!
 
