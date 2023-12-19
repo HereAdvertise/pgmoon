@@ -30,7 +30,7 @@ do
       local CANWRITE = unix.POLLOUT | unix.POLLWRNORM
       local events = assert(unix.poll({
         [self.unix_socket] = unix.POLLOUT
-      }, 0))
+      }))
       if not (events[self.unix_socket]) then
         return nil, "timeout"
       end
@@ -54,7 +54,7 @@ do
         if #self.buf < size then
           local events = assert(unix.poll({
             [self.unix_socket] = unix.POLLIN
-          }, 0))
+          }))
           if not (events[self.unix_socket]) then
             return nil, "timeout"
           end
