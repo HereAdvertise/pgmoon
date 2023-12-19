@@ -763,6 +763,8 @@ describe "pgmoon with server", ->
           enc = encode_json t
           assert.same [['{"hello":"world"}']], enc
 
+          if socket_type == "redbean"
+            return pending "not supported for redbean at the moment."
           t = { foo: "some 'string'" }
           enc = encode_json t
           assert.same [['{"foo":"some ''string''"}']], enc
