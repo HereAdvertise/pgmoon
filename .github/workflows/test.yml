@@ -135,6 +135,12 @@ jobs:
         repository: lunarmodules/busted
         path: redbean-pgmoon/busted
 
+    - name: Clone lunarmodules/Penlight
+      uses: actions/checkout@master
+      with:
+        repository: lunarmodules/Penlight
+        path: redbean-pgmoon/pl
+
     - name: install
       working-directory: redbean-pgmoon
       run: |
@@ -148,6 +154,8 @@ jobs:
         mv busted .lua
         zip -u -r redbean.com .lua
         rm -r .lua
+        mv pl .lua
+        zip -u -r redbean.com .lua
 
     - name: test
       working-directory: redbean-pgmoon
