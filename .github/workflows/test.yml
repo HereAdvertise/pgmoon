@@ -117,6 +117,7 @@ jobs:
       run: |
         luarocks install moonscript --dev
         luarocks install busted
+        luarocks path
 
     - name: build
       run: |
