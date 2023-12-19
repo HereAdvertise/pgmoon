@@ -122,7 +122,7 @@ jobs:
     - name: build
       run: |
         #luarocks make
-        moonc spec/pgmoon_spec.moon spec/pgmoon_ssl_spec.moon
+        moonc spec
         mkdir redbean-pgmoon
 
     - name: Clone Propagram/pgmoon
