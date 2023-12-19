@@ -97,6 +97,7 @@ jobs:
       fail-fast: false
       matrix:
         postgresVersion: ["14"]
+        luaVersion: ["5.4"]
 
     env:
       PGUSER: postgres
