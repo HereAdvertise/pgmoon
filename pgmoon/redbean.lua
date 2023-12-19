@@ -8,14 +8,14 @@ do
       if not (self.unix_socket) then
         self.unix_socket = assert(unix.socket())
       end
+      if self.timeout then
+        unix.setsockopt(self.unix_socket, SOL_SOCKET, SO_RCVTIMEO, self.timeout)
+        unix.setsockopt(self.unix_socket, SOL_SOCKET, SO_SNDTIMEO, self.timeout)
+      end
       local err
       self.sock, err = unix.connect(self.unix_socket, assert(ResolveIp(host)), port)
       if not (self.sock) then
         return nil, err:doc()
-      end
-      if self.timeout then
-        unix.setsockopt(self.unix_socket, SOL_SOCKET, SO_RCVTIMEO, self.timeout)
-        unix.setsockopt(self.unix_socket, SOL_SOCKET, SO_SNDTIMEO, self.timeout)
       end
       return true
     end,
