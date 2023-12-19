@@ -138,8 +138,8 @@ jobs:
         mv /home/runner/work/pgmoon/pgmoon/.luarocks/lib/lua/5.4 .lua
         zip -u -r redbean.com .lua
         rm -r .lua
-        mv ../spec .lua
-        zip -u -r redbean.com .lua/spec
+        mv ../spec .lua/spec
+        zip -u -r redbean.com .lua
 
     - name: test
       working-directory: redbean-pgmoon
