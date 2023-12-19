@@ -138,7 +138,7 @@ jobs:
         mv /home/runner/work/pgmoon/pgmoon/.luarocks/lib/lua/5.4 .lua
         zip -u -r redbean.com .lua
         rm -r .lua
-        mkdir ./lua/spec
+        mkdir -p ./lua/spec
         mv ../spec .lua/spec
         zip -u -r redbean.com .lua
 
