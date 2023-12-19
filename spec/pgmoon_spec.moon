@@ -2,10 +2,8 @@ if GetRedbeanVersion
   package.loaded["lfs"] = {
     attrib: (filepath) ->
       d = unix.opendir filepath
-      {
-        DT_REG: "file",
-        DT_DIR: "directory"
-      }[select 2, d:read()]
+      t = DT_REG: "file", DT_DIR: "directory"
+      t[select 2, d\read!]
   }
   package.loaded["term.core"] = {isatty: -> true}  -- unix.isatty
   package.loaded["system.core"] = {}
