@@ -3,12 +3,16 @@ if GetRedbeanVersion
     attributes: (filepath) ->
       d = unix.opendir filepath
       return nil unless d
-      t = DT_REG: "file", DT_DIR: "directory"
+      t = [DT_REG]: "file", [DT_DIR]: "directory"
       t[assert select 2, d\read!]
     chdir: unix.chdir
   }
   package.loaded["term.core"] = {isatty: -> true}  -- unix.isatty
   package.loaded["system.core"] = {}
+  package.loaded["system"] = {
+    gettime: unix.clock_gettime!
+    monotime: unix.clock_gettime CLOCK_MONOTONIC
+  }
   require'busted.runner'!
 
 import Postgres from require "pgmoon"
