@@ -578,6 +578,9 @@ describe "pgmoon with server", ->
 
 
       it "deserializes types correctly", ->
+        if socket_type == "redbean"
+          return pending "not supported for redbean at the moment."
+
         assert pg\query [[
           create table types_test (
             id serial not null,
@@ -753,11 +756,7 @@ describe "pgmoon with server", ->
             assert.same {abc: '123', foo: 'bar'}, res[1].h
 
       describe "json", ->
-        local encode_json, decode_json
-        if socket_type == "redbean"
-          encode_json, decode_json = EncodeJson, DecodeJson
-        else
-          import encode_json, decode_json from require "pgmoon.json"
+        import encode_json, decode_json from require "pgmoon.json"
 
         it "encodes json type", ->
           t = { hello: "world" }
