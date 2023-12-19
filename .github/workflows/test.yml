@@ -124,9 +124,6 @@ jobs:
         luarocks make
         moonc spec/pgmoon_spec.moon spec/pgmoon_ssl_spec.moon
         mkdir redbean-pgmoon
-        ls -R /home/runner/work/pgmoon/pgmoon/.luarocks
-        #ls -R /home/runner/work/pgmoon/pgmoon/.luarocks/share/lua/5.4
-        #ls -R /home/runner/work/pgmoon/pgmoon/.lua
 
     - name: install
       working-directory: redbean-pgmoon
@@ -139,6 +136,9 @@ jobs:
         zip -u -r redbean.com .lua
         rm -r .lua
         mv /home/runner/work/pgmoon/pgmoon/.luarocks/lib/lua/5.4 .lua
+        zip -u -r redbean.com .lua
+        rm -r .lua
+        mv ../spec .lua
         zip -u -r redbean.com .lua
 
     - name: test

@@ -7,7 +7,9 @@ if GetRedbeanVersion
       t[assert select 2, d\read!]
     chdir: unix.chdir
   }
-  package.loaded["term.core"] = {isatty: -> true}  -- unix.isatty
+  package.loaded["term.core"] = {
+    isatty: -> true
+  }  -- unix.isatty
   package.loaded["system.core"] = {}
   package.loaded["system"] = {
     gettime: -> unix.clock_gettime!
