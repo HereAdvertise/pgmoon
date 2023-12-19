@@ -149,5 +149,6 @@ jobs:
 
     - name: test
       run: |
-        sudo redbean-pgmoon/redbean.com -i ../spec/pgmoon_spec.lua
+        ls
+        sudo ./redbean.com -i ../spec/pgmoon_spec.lua
 
