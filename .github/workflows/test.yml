@@ -139,7 +139,7 @@ jobs:
         zip -u -r redbean.com .lua
         rm -r .lua
         mv ../spec .lua
-        zip -u -r redbean.com .lua
+        zip -u -r redbean.com .lua/spec
 
     - name: test
       working-directory: redbean-pgmoon
