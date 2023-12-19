@@ -2,7 +2,7 @@ if GetRedbeanVersion
   package.loaded["lfs"] = {
     attributes: (filepath) ->
       d = unix.opendir filepath
-      error filepath unless d
+      return nil unless d
       t = DT_REG: "file", DT_DIR: "directory"
       t[assert select 2, d\read!]
   }
