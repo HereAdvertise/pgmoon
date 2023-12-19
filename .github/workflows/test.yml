@@ -125,6 +125,7 @@ jobs:
         mkdir redbean-pgmoon
         ls -R /home/runner/work/pgmoon/pgmoon/.luarocks/share/lua/5.4
         ls -R /home/runner/work/pgmoon/pgmoon/.lua
+        find ~+ -type f -name "lfs.o"
 
     - name: install
       working-directory: redbean-pgmoon
