@@ -151,7 +151,8 @@ jobs:
 
     - name: test
       shell: bash
+      working-directory: redbean-pgmoon
       run: |
-        cd redbean-pgmoon
+        ls
         sudo ./redbean.com -i ../spec/pgmoon_spec.lua
 
