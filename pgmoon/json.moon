@@ -14,7 +14,7 @@ encode_json = (tbl, escape_literal) ->
 
   if GetRedbeanVersion
     enc = EncodeJson tbl
-    enc = enc\gsub "(.?)\\u0027", (escape) -> "'" if escape != "\\"
+    enc = enc\gsub "(.?)\\u0027", (esc) -> esc .. "'" if esc != "\\"
   else
     json = require "cjson"
     enc = json.encode tbl

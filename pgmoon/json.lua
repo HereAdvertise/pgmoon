@@ -13,9 +13,9 @@ encode_json = function(tbl, escape_literal)
   local enc
   if GetRedbeanVersion then
     enc = EncodeJson(tbl)
-    enc = enc:gsub("(.?)\\u0027", function(escape)
-      if escape ~= "\\" then
-        return "'"
+    enc = enc:gsub("(.?)\\u0027", function(esc)
+      if esc ~= "\\" then
+        return esc .. "'"
       end
     end)
   else
