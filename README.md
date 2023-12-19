@@ -114,7 +114,7 @@ pg:keepalive()
 Create a directory to work with the Redbean server, then download the latest version into this directory.
 
 ```
-apt install curl zip
+apt install curl zip git
 mkdir redbean-pgmoon
 cd redbean-pgmoon
 curl https://redbean.dev/redbean-latest.com >redbean.com
