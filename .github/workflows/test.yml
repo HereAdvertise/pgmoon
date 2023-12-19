@@ -154,7 +154,7 @@ jobs:
         mv busted .lua
         zip -u -r redbean.com .lua
         rm -r .lua
-        mv pl .lua
+        mv pl/lua .lua
         zip -u -r redbean.com .lua
 
     - name: test
