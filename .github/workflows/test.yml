@@ -151,5 +151,6 @@ jobs:
 
     - name: test
       run: |
+        cd redbean-pgmoon
         ./redbean.com -i ../spec/pgmoon_spec.lua
 
