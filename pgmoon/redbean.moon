@@ -7,14 +7,14 @@ class RedbeanSocket
   connect: (host, port, opts) =>
     @unix_socket = assert unix.socket! unless @unix_socket
 
-    if @timeout
-      unix.setsockopt @unix_socket, SOL_SOCKET, SO_RCVTIMEO, @timeout
-      unix.setsockopt @unix_socket, SOL_SOCKET, SO_SNDTIMEO, @timeout
-
     @sock, err = unix.connect @unix_socket, assert(ResolveIp host), port
 
     unless @sock
       return nil, err\doc!
+
+    if @timeout
+      unix.setsockopt @unix_socket, SOL_SOCKET, SO_RCVTIMEO, @timeout
+      unix.setsockopt @unix_socket, SOL_SOCKET, SO_SNDTIMEO, @timeout
 
     true
 
