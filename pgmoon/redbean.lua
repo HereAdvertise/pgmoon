@@ -13,6 +13,10 @@ do
       if not (self.sock) then
         return nil, err:doc()
       end
+      if self.timeout then
+        unix.setsockopt(self.unix_socket, SOL_SOCKET, SO_RCVTIMEO, self.timeout)
+        unix.setsockopt(self.unix_socket, SOL_SOCKET, SO_SNDTIMEO, self.timeout)
+      end
       return true
     end,
     starttls = function(self, ...)
@@ -26,7 +30,7 @@ do
       local CANWRITE = unix.POLLOUT | unix.POLLWRNORM
       local events = assert(unix.poll({
         [self.unix_socket] = unix.POLLOUT
-      }, self.timeout))
+      }, 0))
       if not (events[self.unix_socket]) then
         return nil, "timeout"
       end
@@ -50,7 +54,7 @@ do
         if #self.buf < size then
           local events = assert(unix.poll({
             [self.unix_socket] = unix.POLLIN
-          }, self.timeout))
+          }, 0))
           if not (events[self.unix_socket]) then
             return nil, "timeout"
           end
@@ -78,7 +82,12 @@ do
       if t then
         t = t / 1000
       end
-      self.timeout = t
+      if self.unix_socket then
+        unix.setsockopt(self.unix_socket, SOL_SOCKET, SO_RCVTIMEO, t)
+        return unix.setsockopt(self.unix_socket, SOL_SOCKET, SO_SNDTIMEO, t)
+      else
+        self.timeout = t
+      end
     end,
     getreusedtimes = function(self)
       return 0

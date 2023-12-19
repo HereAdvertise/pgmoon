@@ -12,6 +12,10 @@ class RedbeanSocket
     unless @sock
       return nil, err\doc!
 
+    if @timeout
+      unix.setsockopt @unix_socket, SOL_SOCKET, SO_RCVTIMEO, @timeout
+      unix.setsockopt @unix_socket, SOL_SOCKET, SO_SNDTIMEO, @timeout
+
     true
 
   -- args: [context][, timeout]
@@ -26,10 +30,10 @@ class RedbeanSocket
     data = flatten ...
 
     CANWRITE = unix.POLLOUT | unix.POLLWRNORM
-    events = assert unix.poll @unix_socket: unix.POLLOUT, @timeout
+    events = assert unix.poll @unix_socket: unix.POLLOUT, 0
     return nil, "timeout" unless events[@unix_socket]
     return nil, "close" if events[@unix_socket] & CANWRITE == 0
-    sent, err = unix.send(@unix_socket, data)
+    sent, err = unix.send @unix_socket, data
     return nil, "timeout" if not sent and err\name! == "EAGAIN"
     sent, err
 
@@ -42,10 +46,10 @@ class RedbeanSocket
     size = tonumber pattern
     if size
         if #@buf < size
-            events = assert unix.poll @unix_socket: unix.POLLIN, @timeout
+            events = assert unix.poll @unix_socket: unix.POLLIN, 0
             return nil, "timeout" unless events[@unix_socket]
             return nil, "close" if events[@unix_socket] & CANREAD == 0
-            @buf = @buf .. assert unix.recv(@unix_socket, size-#@buf)
+            @buf = @buf .. assert unix.recv @unix_socket, size-#@buf
         res = @buf\sub 1, size
         @buf = @buf\sub size+1
         return res
@@ -65,7 +69,11 @@ class RedbeanSocket
     if t
       t = t/1000
 
-    @timeout = t
+    if @unix_socket
+      unix.setsockopt @unix_socket, SOL_SOCKET, SO_RCVTIMEO, t
+      unix.setsockopt @unix_socket, SOL_SOCKET, SO_SNDTIMEO, t
+    else
+      @timeout = t
 
   -- openresty pooling interface, always return 0 to suggest that the socket
   -- is connecting for the first time
