@@ -79,7 +79,7 @@ $ luarocks install luaossl
 
 > **Note:** Use within [OpenResty][] will prioritize built in functions if possible
 
-Parsing complex types like Arrays and HStore requires `lpeg` to be installed.
+Parsing complex types like Arrays and HStore requires `lpeg` to be installed (not supported for `redbean` at the moment)
 
 ## Example
 
