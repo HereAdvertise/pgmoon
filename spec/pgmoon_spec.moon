@@ -117,10 +117,10 @@ describe "bit library compatibility", ->
 
 describe "pgmoon with server", ->
   setup ->
-    os.execute "../spec/postgres.sh start"
+    os.execute GetRedbeanVersion and "../spec/postgres.sh start" or "spec/postgres.sh start"
 
   teardown ->
-    os.execute "../spec/postgres.sh stop"
+    os.execute GetRedbeanVersion and "../spec/postgres.sh stop" or "spec/postgres.sh stop"
 
   for socket_type in *{"luasocket", "cqueues", "nginx", "redbean"}
     if ngx
