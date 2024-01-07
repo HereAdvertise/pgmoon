@@ -109,7 +109,7 @@ pg:keepalive()
 
 ## Usage in Redbean
 
-> **Note:** The connection using Redbean's socket currently does not support SSL. Authentication is only possible using the MD5 method. Do not use it for remote database connections. It is recommended only for connections to local databases.
+> **Note:** The connection using Redbean's socket currently does not support SSL. Authentication is only possible using the [MD5 method](https://stackoverflow.com/a/67270167). Do not use it for remote database connections. It is recommended only for connections to local databases.
 
 Create a directory to work with the Redbean server, then download the latest version into this directory.
 
