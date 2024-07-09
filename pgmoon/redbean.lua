@@ -61,14 +61,26 @@ do
           if events[self.unix_socket] & CANREAD == 0 then
             return nil, "close"
           end
-          self.buf = self.buf .. assert(unix.recv(self.unix_socket, size - #self.buf))
+          local rec = unix.recv(self.unix_socket, size - #self.buf)
+          if rec then
+            self.buf = self.buf .. rec
+          else
+            collectgarbage()
+            self.buf = self.buf .. assert(unix.recv(self.unix_socket, 4096))
+          end
         end
         local res = self.buf:sub(1, size)
         self.buf = self.buf:sub(size + 1)
         return res
       end
       while not self.buf:find("\n") do
-        self.buf = self.buf .. assert(unix.recv(self.unix_socket, 4096))
+        local rec = unix.recv(self.unix_socket, 4096)
+        if rec then
+          self.buf = self.buf .. rec
+        else
+          collectgarbage()
+          self.buf = self.buf .. assert(unix.recv(self.unix_socket, 4096))
+        end
       end
       local pos = self.buf:find("\n")
       local res = self.buf:sub(1, pos - 1):gsub("\r", "")
