@@ -45,46 +45,43 @@ do
     end,
     receive = function(self, ...)
       local pattern = flatten(...)
-      if not (self.buf) then
-        self.buf = ""
-      end
+      local buf = ""
       local CANREAD = unix.POLLIN | unix.POLLRDNORM | unix.POLLRDBAND
       local size = tonumber(pattern)
       if size then
-        if #self.buf < size then
-          local events = assert(unix.poll({
-            [self.unix_socket] = unix.POLLIN
-          }))
-          if not (events[self.unix_socket]) then
-            return nil, "timeout"
-          end
-          if events[self.unix_socket] & CANREAD == 0 then
-            return nil, "close"
-          end
-          local rec = unix.recv(self.unix_socket, size - #self.buf)
-          if rec then
-            self.buf = self.buf .. rec
-          else
-            collectgarbage()
-            self.buf = self.buf .. assert(unix.recv(self.unix_socket, 4096))
-          end
+        local events = assert(unix.poll({
+          [self.unix_socket] = unix.POLLIN
+        }))
+        if not (events[self.unix_socket]) then
+          return nil, "timeout"
         end
-        local res = self.buf:sub(1, size)
-        self.buf = self.buf:sub(size + 1)
-        return res
-      end
-      while not self.buf:find("\n") do
-        local rec = unix.recv(self.unix_socket, 4096)
+        if events[self.unix_socket] & CANREAD == 0 then
+          return nil, "close"
+        end
+        if size > 81920 then
+          size = 81920
+        end
+        local rec = unix.recv(self.unix_socket, size)
         if rec then
-          self.buf = self.buf .. rec
+          buf = rec
         else
           collectgarbage()
-          self.buf = self.buf .. assert(unix.recv(self.unix_socket, 4096))
+          buf = assert(unix.recv(self.unix_socket, size))
+        end
+        return buf
+      end
+      while not buf:find("\n") do
+        local rec = unix.recv(self.unix_socket, 4096)
+        if rec then
+          buf = buf .. rec
+        else
+          collectgarbage()
+          buf = buf .. assert(unix.recv(self.unix_socket, 4096))
         end
       end
-      local pos = self.buf:find("\n")
-      local res = self.buf:sub(1, pos - 1):gsub("\r", "")
-      self.buf = self.buf:sub(pos + 1)
+      local pos = buf:find("\n")
+      local res = buf:sub(1, pos - 1):gsub("\r", "")
+      buf = buf:sub(pos + 1)
       return res
     end,
     close = function(self)
