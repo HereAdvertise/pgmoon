@@ -81,7 +81,6 @@ do
       end
       local pos = buf:find("\n")
       local res = buf:sub(1, pos - 1):gsub("\r", "")
-      buf = buf:sub(pos + 1)
       return res
     end,
     close = function(self)
