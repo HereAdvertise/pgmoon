@@ -49,16 +49,26 @@ class RedbeanSocket
             events = assert unix.poll @unix_socket: unix.POLLIN
             return nil, "timeout" unless events[@unix_socket]
             return nil, "close" if events[@unix_socket] & CANREAD == 0
-            @buf = @buf .. assert unix.recv @unix_socket, size-#@buf
+            rec = unix.recv @unix_socket, size-#@buf
+            if rec
+                @buf ..= rec
+            else
+                collectgarbage!
+                @buf ..= assert unix.recv @unix_socket, 4096
         res = @buf\sub 1, size
         @buf = @buf\sub size+1
         return res
 
     while not @buf\find "\n"
-        @buf = @buf .. assert unix.recv @unix_socket, 4096
+        rec = unix.recv @unix_socket, 4096
+        if rec
+            @buf ..= rec
+        else
+            collectgarbage!
+            @buf ..= assert unix.recv @unix_socket, 4096
         
     pos = @buf\find "\n"
-    res = @buf\sub(1, pos-1)\gsub("\r", "")
+    res = @buf\sub(1, pos-1)\gsub "\r", ""
     @buf = @buf\sub pos+1
     res
 
@@ -83,5 +93,3 @@ class RedbeanSocket
     error "You attempted to call setkeepalive on a Redbean socket. This method is only available for the ngx cosocket API for releasing a socket back into the connection pool"
 
 { :RedbeanSocket }
-
-
