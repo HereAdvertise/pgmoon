@@ -66,7 +66,6 @@ class RedbeanSocket
         
     pos = buf\find "\n"
     res = buf\sub(1, pos-1)\gsub "\r", ""
-    buf = buf\sub pos+1
     res
 
   close: =>
