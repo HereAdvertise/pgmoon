@@ -39,37 +39,34 @@ class RedbeanSocket
 
   receive: (...) =>
     pattern = flatten ...
-
-    @buf = "" unless @buf
-
+    buf = ""
     CANREAD = unix.POLLIN | unix.POLLRDNORM | unix.POLLRDBAND
     size = tonumber pattern
     if size
-        if #@buf < size
-            events = assert unix.poll @unix_socket: unix.POLLIN
-            return nil, "timeout" unless events[@unix_socket]
-            return nil, "close" if events[@unix_socket] & CANREAD == 0
-            rec = unix.recv @unix_socket, size-#@buf
-            if rec
-                @buf ..= rec
-            else
-                collectgarbage!
-                @buf ..= assert unix.recv @unix_socket, 4096
-        res = @buf\sub 1, size
-        @buf = @buf\sub size+1
-        return res
-
-    while not @buf\find "\n"
-        rec = unix.recv @unix_socket, 4096
+        events = assert unix.poll @unix_socket: unix.POLLIN
+        return nil, "timeout" unless events[@unix_socket]
+        return nil, "close" if events[@unix_socket] & CANREAD == 0
+        if size > 81920
+          size = 81920
+        rec = unix.recv @unix_socket, size
         if rec
-            @buf ..= rec
+            buf = rec
         else
             collectgarbage!
-            @buf ..= assert unix.recv @unix_socket, 4096
+            buf = assert unix.recv @unix_socket, size
+        return buf
+
+    while not buf\find "\n"
+        rec = unix.recv @unix_socket, 4096
+        if rec
+            buf ..= rec
+        else
+            collectgarbage!
+            buf ..= assert unix.recv @unix_socket, 4096
         
-    pos = @buf\find "\n"
-    res = @buf\sub(1, pos-1)\gsub "\r", ""
-    @buf = @buf\sub pos+1
+    pos = buf\find "\n"
+    res = buf\sub(1, pos-1)\gsub "\r", ""
+    buf = buf\sub pos+1
     res
 
   close: =>
