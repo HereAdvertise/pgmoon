@@ -13,8 +13,8 @@ class RedbeanSocket
       return nil, err\doc!
 
     if @timeout
-      unix.setsockopt @unix_socket, SOL_SOCKET, SO_RCVTIMEO, @timeout
-      unix.setsockopt @unix_socket, SOL_SOCKET, SO_SNDTIMEO, @timeout
+      unix.setsockopt @unix_socket, SOL_SOCKET, SO_RCVTIMEO, @timeout / 1000
+      unix.setsockopt @unix_socket, SOL_SOCKET, SO_SNDTIMEO, @timeout / 1000
 
     true
 
@@ -30,7 +30,7 @@ class RedbeanSocket
     data = flatten ...
 
     CANWRITE = unix.POLLOUT | unix.POLLWRNORM
-    events = assert unix.poll @unix_socket: unix.POLLOUT
+    events = assert unix.poll @unix_socket: unix.POLLOUT, @timeout
     return nil, "timeout" unless events[@unix_socket]
     return nil, "close" if events[@unix_socket] & CANWRITE == 0
     sent, err = unix.send @unix_socket, data
@@ -41,26 +41,28 @@ class RedbeanSocket
     CANREAD = unix.POLLIN | unix.POLLRDNORM | unix.POLLRDBAND
     size = tonumber(pattern)
     if size
-      events = assert unix.poll @unix_socket: unix.POLLIN
+      events = assert unix.poll @unix_socket: unix.POLLIN, @timeout
       return nil, "timeout" unless events[@unix_socket]
       return nil, "close" if events[@unix_socket] & CANREAD == 0
       return unix.recv @unix_socket, size
 
     buf = ""
-    while not buf\find "\n"
-        buf = buf .. assert unix.recv @unix_socket, 4096
+    while true
+        events = assert unix.poll @unix_socket: unix.POLLIN, @timeout
+        return nil, "timeout" unless events[@unix_socket]
+        if events[@unix_socket] & CANREAD == 0
+          break
+        else
+          buf = buf .. assert unix.recv @unix_socket, 4096
     buf
 
   close: =>
     assert unix.close @unix_socket
 
   settimeout: (t) =>
-    if t
-      t = t/1000
-
     if @unix_socket
-      unix.setsockopt @unix_socket, SOL_SOCKET, SO_RCVTIMEO, t
-      unix.setsockopt @unix_socket, SOL_SOCKET, SO_SNDTIMEO, t
+      unix.setsockopt @unix_socket, SOL_SOCKET, SO_RCVTIMEO, t / 1000
+      unix.setsockopt @unix_socket, SOL_SOCKET, SO_SNDTIMEO, t / 1000
     else
       @timeout = t
 
