@@ -14,8 +14,8 @@ do
         return nil, err:doc()
       end
       if self.timeout then
-        unix.setsockopt(self.unix_socket, SOL_SOCKET, SO_RCVTIMEO, self.timeout)
-        unix.setsockopt(self.unix_socket, SOL_SOCKET, SO_SNDTIMEO, self.timeout)
+        unix.setsockopt(self.unix_socket, SOL_SOCKET, SO_RCVTIMEO, self.timeout / 1000)
+        unix.setsockopt(self.unix_socket, SOL_SOCKET, SO_SNDTIMEO, self.timeout / 1000)
       end
       return true
     end,
@@ -30,7 +30,7 @@ do
       local CANWRITE = unix.POLLOUT | unix.POLLWRNORM
       local events = assert(unix.poll({
         [self.unix_socket] = unix.POLLOUT
-      }))
+      }, self.timeout))
       if not (events[self.unix_socket]) then
         return nil, "timeout"
       end
@@ -49,7 +49,7 @@ do
       if size then
         local events = assert(unix.poll({
           [self.unix_socket] = unix.POLLIN
-        }))
+        }, self.timeout))
         if not (events[self.unix_socket]) then
           return nil, "timeout"
         end
@@ -59,8 +59,18 @@ do
         return unix.recv(self.unix_socket, size)
       end
       local buf = ""
-      while not buf:find("\n") do
-        buf = buf .. assert(unix.recv(self.unix_socket, 4096))
+      while true do
+        local events = assert(unix.poll({
+          [self.unix_socket] = unix.POLLIN
+        }, self.timeout))
+        if not (events[self.unix_socket]) then
+          return nil, "timeout"
+        end
+        if events[self.unix_socket] & CANREAD == 0 then
+          break
+        else
+          buf = buf .. assert(unix.recv(self.unix_socket, 4096))
+        end
       end
       return buf
     end,
@@ -68,12 +78,9 @@ do
       return assert(unix.close(self.unix_socket))
     end,
     settimeout = function(self, t)
-      if t then
-        t = t / 1000
-      end
       if self.unix_socket then
-        unix.setsockopt(self.unix_socket, SOL_SOCKET, SO_RCVTIMEO, t)
-        return unix.setsockopt(self.unix_socket, SOL_SOCKET, SO_SNDTIMEO, t)
+        unix.setsockopt(self.unix_socket, SOL_SOCKET, SO_RCVTIMEO, t / 1000)
+        return unix.setsockopt(self.unix_socket, SOL_SOCKET, SO_SNDTIMEO, t / 1000)
       else
         self.timeout = t
       end
