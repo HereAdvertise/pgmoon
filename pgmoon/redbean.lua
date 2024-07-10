@@ -43,36 +43,26 @@ do
       end
       return sent, err
     end,
-    receive = function(self, ...)
-      if not (self.buf) then
-        self.buf = ""
-      end
+    receive = function(self, pattern)
       local CANREAD = unix.POLLIN | unix.POLLRDNORM | unix.POLLRDBAND
-      local size = ...
+      local size = tonumber(pattern)
       if size then
-        if #self.buf < size then
-          local events = assert(unix.poll({
-            [self.unix_socket] = unix.POLLIN
-          }))
-          if not (events[self.unix_socket]) then
-            return nil, "timeout"
-          end
-          if events[self.unix_socket] & CANREAD == 0 then
-            return nil, "close"
-          end
-          self.buf = self.buf .. assert(unix.recv(self.unix_socket, size - #self.buf))
+        local events = assert(unix.poll({
+          [self.unix_socket] = unix.POLLIN
+        }))
+        if not (events[self.unix_socket]) then
+          return nil, "timeout"
         end
-        local res = self.buf:sub(1, size)
-        self.buf = self.buf:sub(size + 1)
-        return res
+        if events[self.unix_socket] & CANREAD == 0 then
+          return nil, "close"
+        end
+        return unix.recv(self.unix_socket, size)
       end
-      while not self.buf:find("\n") do
-        self.buf = self.buf .. assert(unix.recv(self.unix_socket, 4096))
+      local buf = ""
+      while not buf:find("\n") do
+        buf = buf .. assert(unix.recv(self.unix_socket, 4096))
       end
-      local pos = self.buf:find("\n")
-      local res = self.buf:sub(1, pos - 1):gsub("\r", "")
-      self.buf = self.buf:sub(pos + 1)
-      return res
+      return buf
     end,
     close = function(self)
       return assert(unix.close(self.unix_socket))
