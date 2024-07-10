@@ -44,43 +44,34 @@ do
       return sent, err
     end,
     receive = function(self, ...)
-      local pattern = flatten(...)
-      local buf = ""
+      if not (self.buf) then
+        self.buf = ""
+      end
       local CANREAD = unix.POLLIN | unix.POLLRDNORM | unix.POLLRDBAND
-      local size = tonumber(pattern)
+      local size = ...
       if size then
-        local events = assert(unix.poll({
-          [self.unix_socket] = unix.POLLIN
-        }))
-        if not (events[self.unix_socket]) then
-          return nil, "timeout"
+        if #self.buf < size then
+          local events = assert(unix.poll({
+            [self.unix_socket] = unix.POLLIN
+          }))
+          if not (events[self.unix_socket]) then
+            return nil, "timeout"
+          end
+          if events[self.unix_socket] & CANREAD == 0 then
+            return nil, "close"
+          end
+          self.buf = self.buf .. assert(unix.recv(self.unix_socket, size - #self.buf))
         end
-        if events[self.unix_socket] & CANREAD == 0 then
-          return nil, "close"
-        end
-        if size > 81920 then
-          size = 81920
-        end
-        local rec = unix.recv(self.unix_socket, size)
-        if rec then
-          buf = rec
-        else
-          collectgarbage()
-          buf = assert(unix.recv(self.unix_socket, size))
-        end
-        return buf
+        local res = self.buf:sub(1, size)
+        self.buf = self.buf:sub(size + 1)
+        return res
       end
-      while not buf:find("\n") do
-        local rec = unix.recv(self.unix_socket, 4096)
-        if rec then
-          buf = buf .. rec
-        else
-          collectgarbage()
-          buf = buf .. assert(unix.recv(self.unix_socket, 4096))
-        end
+      while not self.buf:find("\n") do
+        self.buf = self.buf .. assert(unix.recv(self.unix_socket, 4096))
       end
-      local pos = buf:find("\n")
-      local res = buf:sub(1, pos - 1):gsub("\r", "")
+      local pos = self.buf:find("\n")
+      local res = self.buf:sub(1, pos - 1):gsub("\r", "")
+      self.buf = self.buf:sub(pos + 1)
       return res
     end,
     close = function(self)
