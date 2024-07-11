@@ -78,11 +78,10 @@ do
       return assert(unix.close(self.unix_socket))
     end,
     settimeout = function(self, t)
+      self.timeout = t
       if self.unix_socket then
         unix.setsockopt(self.unix_socket, SOL_SOCKET, SO_RCVTIMEO, t / 1000)
         return unix.setsockopt(self.unix_socket, SOL_SOCKET, SO_SNDTIMEO, t / 1000)
-      else
-        self.timeout = t
       end
     end,
     getreusedtimes = function(self)
