@@ -58,21 +58,7 @@ do
         end
         return unix.recv(self.unix_socket, size)
       end
-      local buf = ""
-      while true do
-        local events = assert(unix.poll({
-          [self.unix_socket] = unix.POLLIN
-        }, self.timeout))
-        if not (events[self.unix_socket]) then
-          return nil, "timeout"
-        end
-        if events[self.unix_socket] & CANREAD == 0 then
-          break
-        else
-          buf = buf .. assert(unix.recv(self.unix_socket, 4096))
-        end
-      end
-      return buf
+      return ""
     end,
     close = function(self)
       return assert(unix.close(self.unix_socket))
