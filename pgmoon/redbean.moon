@@ -60,11 +60,10 @@ class RedbeanSocket
     assert unix.close @unix_socket
 
   settimeout: (t) =>
+    @timeout = t
     if @unix_socket
       unix.setsockopt @unix_socket, SOL_SOCKET, SO_RCVTIMEO, t / 1000
       unix.setsockopt @unix_socket, SOL_SOCKET, SO_SNDTIMEO, t / 1000
-    else
-      @timeout = t
 
   -- openresty pooling interface, always return 0 to suggest that the socket
   -- is connecting for the first time
