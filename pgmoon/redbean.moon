@@ -45,16 +45,7 @@ class RedbeanSocket
       return nil, "timeout" unless events[@unix_socket]
       return nil, "close" if events[@unix_socket] & CANREAD == 0
       return unix.recv @unix_socket, size
-
-    buf = ""
-    while true
-        events = assert unix.poll @unix_socket: unix.POLLIN, @timeout
-        return nil, "timeout" unless events[@unix_socket]
-        if events[@unix_socket] & CANREAD == 0
-          break
-        else
-          buf = buf .. assert unix.recv @unix_socket, 4096
-    buf
+    ""
 
   close: =>
     assert unix.close @unix_socket
