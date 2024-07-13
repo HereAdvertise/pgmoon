@@ -46,6 +46,7 @@ do
     receive = function(self, pattern)
       local CANREAD = unix.POLLIN | unix.POLLRDNORM | unix.POLLRDBAND
       local size = tonumber(pattern)
+      local buf = ""
       if size then
         local events = assert(unix.poll({
           [self.unix_socket] = unix.POLLIN
@@ -56,9 +57,16 @@ do
         if events[self.unix_socket] & CANREAD == 0 then
           return nil, "close"
         end
-        return unix.recv(self.unix_socket, size)
+        while #buf < size do
+          local rec = unix.recv(self.unix_socket, size - #buf)
+          if #rec == 0 then
+            break
+          else
+            buf = buf .. rec
+          end
+        end
       end
-      return ""
+      return buf
     end,
     close = function(self)
       return assert(unix.close(self.unix_socket))
