@@ -37,11 +37,18 @@ do
       if events[self.unix_socket] & CANWRITE == 0 then
         return nil, "close"
       end
-      local sent, err = unix.send(self.unix_socket, data)
-      if not sent and err:name() == "EAGAIN" then
-        return nil, "timeout"
+      local size = 0
+      while size < #data do
+        local sent, err = unix.send(self.unix_socket, string.sub(data, size + 1))
+        if not sent and err:name() == "EAGAIN" then
+          return nil, "timeout"
+        end
+        if not sent then
+          return nil, err:doc()
+        end
+        size = size + sent
       end
-      return sent, err
+      return size
     end,
     receive = function(self, pattern)
       local CANREAD = unix.POLLIN | unix.POLLRDNORM | unix.POLLRDBAND
@@ -58,7 +65,7 @@ do
           return nil, "close"
         end
         while #buf < size do
-          local rec = unix.recv(self.unix_socket, size - #buf)
+          local rec = assert(unix.recv(self.unix_socket, size - #buf))
           if #rec == 0 then
             break
           else
