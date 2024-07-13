@@ -39,6 +39,7 @@ class RedbeanSocket
       return nil, "timeout" if not sent and err\name! == "EAGAIN"
       return nil, err\doc! if not sent
       size += sent
+      break if sent == 0
     size
 
   receive: (pattern) =>
