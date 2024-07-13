@@ -33,9 +33,13 @@ class RedbeanSocket
     events = assert unix.poll @unix_socket: unix.POLLOUT, @timeout
     return nil, "timeout" unless events[@unix_socket]
     return nil, "close" if events[@unix_socket] & CANWRITE == 0
-    sent, err = unix.send @unix_socket, data
-    return nil, "timeout" if not sent and err\name! == "EAGAIN"
-    sent, err
+    size = 0
+    while size < #data
+      sent, err = unix.send @unix_socket, string.sub data, size + 1
+      return nil, "timeout" if not sent and err\name! == "EAGAIN"
+      return nil, err\doc! if not sent
+      size += sent
+    size
 
   receive: (pattern) =>
     CANREAD = unix.POLLIN | unix.POLLRDNORM | unix.POLLRDBAND
@@ -46,7 +50,7 @@ class RedbeanSocket
       return nil, "timeout" unless events[@unix_socket]
       return nil, "close" if events[@unix_socket] & CANREAD == 0
       while #buf < size
-        rec = unix.recv @unix_socket, size - #buf
+        rec = assert unix.recv @unix_socket, size - #buf
         if #rec == 0
           break
         else
