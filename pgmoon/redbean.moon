@@ -40,12 +40,18 @@ class RedbeanSocket
   receive: (pattern) =>
     CANREAD = unix.POLLIN | unix.POLLRDNORM | unix.POLLRDBAND
     size = tonumber(pattern)
+    buf = ""
     if size
       events = assert unix.poll @unix_socket: unix.POLLIN, @timeout
       return nil, "timeout" unless events[@unix_socket]
       return nil, "close" if events[@unix_socket] & CANREAD == 0
-      return unix.recv @unix_socket, size
-    ""
+      while #buf < size
+        rec = unix.recv @unix_socket, size - #buf
+        if #rec == 0
+          break
+        else
+          buf ..= rec
+    buf
 
   close: =>
     assert unix.close @unix_socket
