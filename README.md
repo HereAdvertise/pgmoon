@@ -121,24 +121,31 @@ curl https://redbean.dev/redbean-latest.com >redbean.com
 chmod +x redbean.com
 ```
 
-Create the file `test.lua` to access the Postgres database.
+Create the file `.init.lua` to access the Postgres database.
 
 ```lua
--- test.lua
-
+-- .init.lua
 local pgmoon = require("pgmoon")
 
-local pg = pgmoon.new({
-  host = "127.0.0.1",
-  port = "5432",
-  database = "database_name",
-  user = "database_user",
-  password = "database_password"
-})
+function OnWorkerStart()
+  _G.pg = pgmoon.new({
+    host = "127.0.0.1",
+    port = "5432",
+    database = "mydb",
+    user = "postgres"
+  })
+  assert(pg:connect())
+end
 
-assert(pg:connect())
+function OnWorkerStop()
+  assert(pg:disconnect())
+end
 
-print(EncodeJson(assert(pg:query("SELECT 'hello world';"))))
+function OnHttpRequest()
+  local res = assert(pg:query("SELECT 'hello world';"))
+
+  Write(EncodeJson(res, {pretty = true}))
+end
 ```
 
 The Redbean server operates within a zipped structure. To integrate pgmoon into this structure, follow the steps below:
@@ -149,10 +156,10 @@ mv pgmoon .lua
 zip -r redbean.com .lua
 ```
 
-Now just execute the `test.lua` file.
+Now just execute the Redbean server.
 
 ```
-./redbean.com -i test.lua
+./redbean.com
 ```
 
 ## Considerations
