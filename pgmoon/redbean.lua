@@ -11,6 +11,8 @@ do
       local err
       self.sock, err = unix.connect(self.unix_socket, assert(ResolveIp(host)), port)
       if not (self.sock) then
+        unix.close(self.unix_socket)
+        self.unix_socket = nil
         return nil, err:doc()
       end
       if self.timeout then
@@ -79,7 +81,8 @@ do
       return buf
     end,
     close = function(self)
-      return assert(unix.close(self.unix_socket))
+      assert(unix.close(self.unix_socket))
+      self.unix_socket = nil
     end,
     settimeout = function(self, t)
       self.timeout = t
