@@ -81,8 +81,9 @@ do
       return buf
     end,
     close = function(self)
+      local res = unix.close(self.unix_socket)
       self.unix_socket = nil
-      return unix.close(self.unix_socket)
+      return res
     end,
     settimeout = function(self, t)
       self.timeout = t
