@@ -61,8 +61,8 @@ class RedbeanSocket
     buf
 
   close: =>
-    assert unix.close @unix_socket
     @unix_socket = nil
+    unix.close @unix_socket
 
   settimeout: (t) =>
     @timeout = t
@@ -78,4 +78,5 @@ class RedbeanSocket
     error "You attempted to call setkeepalive on a Redbean socket. This method is only available for the ngx cosocket API for releasing a socket back into the connection pool"
 
 { :RedbeanSocket }
+
 
